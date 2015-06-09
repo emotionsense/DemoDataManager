@@ -16,3 +16,5 @@ proguard-project.txt
 
 project.properties
 
+src/com/emotionsense/demo/data/loggers/RemoteServerDetails.java
+

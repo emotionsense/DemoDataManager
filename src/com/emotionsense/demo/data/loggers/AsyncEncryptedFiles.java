@@ -34,38 +34,41 @@ public class AsyncEncryptedFiles extends AbstractAsyncTransferLogger
 	{
 		return RemoteServerDetails.FILE_POST_URL;
 	}
-	
+
 	@Override
 	protected String getPostKey()
 	{
-		return RemoteServerDetails.DATA_KEY;
+		return RemoteServerDetails.FILE_KEY;
 	}
-	
+
 	@Override
 	protected String getSuccessfulPostResponse()
 	{
 		return RemoteServerDetails.RESPONSE_ON_SUCCESS;
 	}
-	
+
 	@Override
 	protected HashMap<String, String> getPostParameters()
 	{
-		// Note: no additional parameters used in demo.
-		return null;
+		// Note: any additional parameters (e.g., API key-value) that your URL
+		// requires
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put(RemoteServerDetails.API_KEY_KEY, RemoteServerDetails.API_KEY_VALUE);
+		return params;
 	}
 
 	@Override
 	protected long getDataLifeMillis()
 	{
-		// Note: all data that is more than 1 hour old will be transferred
-		return 1000L * 60 * 60 * 1;
+		// Note: all files older than a minute will be uploaded
+		return 1000L * 30;
 	}
 
 	@Override
 	protected long getTransferAlarmLengthMillis()
 	{
-		// Note: transfer alarm will fire every 2 hours
-		return 1000L * 60 * 60 * 2;
+		// Note: transfer alarm will fire every 10 minutes
+		return 1000L * 60 * 1;
 	}
 
 	@Override

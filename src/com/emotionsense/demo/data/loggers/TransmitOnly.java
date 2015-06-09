@@ -31,28 +31,31 @@ public class TransmitOnly extends AbstractImmediateTransferLogger
 	@Override
 	protected String getPostKey()
 	{
-		return "key";
+		// Note: the key that will be used when POST'ing your data
+		return "data";
 	}
 
 	@Override
 	protected String getDataPostURL()
 	{
 		// Note: add the URL (http://...) you are POST'ing data to.
-		return null;
+		return RemoteServerDetails.JSON_POST_URL;
 	}
 
 	@Override
 	protected String getSuccessfulPostResponse()
 	{
 		// Note: this is a string your server returns when data has been received
-		return null;
+		return RemoteServerDetails.RESPONSE_ON_SUCCESS;
 	}
 
 	@Override
 	protected HashMap<String, String> getPostParameters()
 	{
 		// Note: any additional parameters (e.g., API key-value) that your URL requires
-		return null;
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put(RemoteServerDetails.API_KEY_KEY, RemoteServerDetails.API_KEY_VALUE);
+		return params;
 	}
 
 	@Override

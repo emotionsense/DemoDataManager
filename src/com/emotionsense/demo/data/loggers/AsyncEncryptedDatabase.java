@@ -34,24 +34,27 @@ public class AsyncEncryptedDatabase extends AbstractAsyncTransferLogger
 	{
 		return RemoteServerDetails.FILE_POST_URL;
 	}
-	
+
 	@Override
 	protected String getPostKey()
 	{
 		return RemoteServerDetails.DATA_KEY;
 	}
-	
+
 	@Override
 	protected String getSuccessfulPostResponse()
 	{
 		return RemoteServerDetails.RESPONSE_ON_SUCCESS;
 	}
-	
+
 	@Override
 	protected HashMap<String, String> getPostParameters()
 	{
-		// Note: no additional parameters used in demo.
-		return null;
+		// Note: any additional parameters (e.g., API key-value) that your URL
+		// requires
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put(RemoteServerDetails.API_KEY_KEY, RemoteServerDetails.API_KEY_VALUE);
+		return params;
 	}
 
 	@Override
