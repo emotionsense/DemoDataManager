@@ -12,16 +12,17 @@ import com.ubhave.sensormanager.sensors.SensorUtils;
 
 public class SenseOnceThread extends Thread
 {
-	private final int sensorType = SensorUtils.SENSOR_TYPE_STEP_COUNTER;
+	private final int sensorType;
 	private final Activity resultScreen;
 	private final ESSensorManager sensorManager;
 	private final AbstractDataLogger logger;
 	
-	public SenseOnceThread(final Activity resultScreen, final ESSensorManager sensorManager, AbstractDataLogger logger)
+	public SenseOnceThread(final Activity resultScreen, final ESSensorManager sensorManager, AbstractDataLogger logger, int sensorType)
 	{
 		this.resultScreen = resultScreen;
 		this.sensorManager = sensorManager;
 		this.logger = logger;
+		this.sensorType = sensorType;
 	}
 	
 	private void toast(final String message)

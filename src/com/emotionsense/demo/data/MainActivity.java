@@ -21,9 +21,11 @@ public class MainActivity extends Activity
 
 	private AbstractDataLogger logger;
 	private ESSensorManager sensorManager;
-	private SubscribeThread[] subscribeThread;
+	private SubscribeThread[] subscribeThreads;
+	private SenseOnceThread[] pullThreads;
 
-	private final int[] pullSensors = {  };
+	private final int[] pushSensors = {};
+	private final int[] pullSensors = {};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -37,36 +39,25 @@ public class MainActivity extends Activity
 			sensorManager = ESSensorManager.getSensorManager(this);
 
 			// Use this thread to collect a single sample of pull sensor data
-			SenseOnceThread sensingThread = new SenseOnceThread(this, sensorManager, logger);
-			sensingThread.start();
+			pullThreads = new SenseOnceThread[pullSensors.length];
+			for (int i = 0; i < pullSensors.length; i++)
+			{
+				pullThreads[i] = new SenseOnceThread(this, sensorManager, logger, pullSensors[i]);
+				pullThreads[i].start();
+			}
+
+			subscribeThreads = new SubscribeThread[pushSensors.length];
+			for (int i = 0; i < pushSensors.length; i++)
+			{
+				subscribeThreads[i] = new SubscribeThread(this, sensorManager, logger, pushSensors[i]);
+				subscribeThreads[i].start();
+			}
 		}
 		catch (Exception e)
 		{
 			Toast.makeText(this, "" + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
 			Log.d(LOG_TAG, e.getLocalizedMessage());
 			e.printStackTrace();
-		}
-	}
-
-	@Override
-	protected void onDestroy()
-	{
-		super.onDestroy();
-		for (SubscribeThread thread : subscribeThread)
-		{
-			thread.stopSensing();
-		}
-	}
-
-	@Override
-	protected void onResume()
-	{
-		super.onResume();
-		subscribeThread = new SubscribeThread[pullSensors.length];
-		for (int i = 0; i < pullSensors.length; i++)
-		{
-			subscribeThread[i] = new SubscribeThread(this, sensorManager, logger, pullSensors[i]);
-			subscribeThread[i].start();
 		}
 	}
 
