@@ -8,22 +8,22 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.emotionsense.demo.data.loggers.StoreOnlyUnencryptedDatabase;
+import com.emotionsense.demo.data.loggers.StoreOnlyUnencryptedFiles;
 import com.ubhave.datahandler.ESDataManager;
 import com.ubhave.datahandler.loggertypes.AbstractDataLogger;
-import com.ubhave.sensormanager.ESException;
 import com.ubhave.sensormanager.ESSensorManager;
-import com.ubhave.sensormanager.SensorDataListener;
 import com.ubhave.sensormanager.data.SensorData;
 import com.ubhave.sensormanager.sensors.SensorUtils;
 
-public class MainActivity extends Activity implements SensorDataListener
+public class MainActivity extends Activity
 {
 	private final static String LOG_TAG = "MainActivity";
-	
-	private ESSensorManager sensorManager;
+
 	private AbstractDataLogger logger;
-	private int subscriptionId;
+	private ESSensorManager sensorManager;
+	private SubscribeThread[] subscribeThread;
+
+	private final int[] pullSensors = {  };
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -33,63 +33,43 @@ public class MainActivity extends Activity implements SensorDataListener
 		try
 		{
 			// TODO: change this line of code to change the type of data logger
-			logger = StoreOnlyUnencryptedDatabase.getInstance();
+			logger = StoreOnlyUnencryptedFiles.getInstance();
 			sensorManager = ESSensorManager.getSensorManager(this);
+
+			// Use this thread to collect a single sample of pull sensor data
+			SenseOnceThread sensingThread = new SenseOnceThread(this, sensorManager, logger);
+			sensingThread.start();
 		}
 		catch (Exception e)
 		{
-			Log.d(LOG_TAG, e.getLocalizedMessage());
-			e.printStackTrace();
-		}
-	}
-	
-	@Override
-	protected void onPause()
-	{
-		super.onPause();
-		try
-		{
-			sensorManager.unsubscribeFromSensorData(subscriptionId);
-			Log.d(LOG_TAG, "Unsubscribed from proximity sensor subscription: "+subscriptionId);
-		}
-		catch (ESException e)
-		{
-			Log.d(LOG_TAG, e.getLocalizedMessage());
-			e.printStackTrace();
-		}
-	}
-	
-	@Override
-	protected void onResume()
-	{
-		super.onResume();
-		try
-		{
-			subscriptionId = sensorManager.subscribeToSensorData(SensorUtils.SENSOR_TYPE_PROXIMITY, this);
-			Log.d(LOG_TAG, "Subscribed to proximity sensor with id: "+subscriptionId);
-		}
-		catch (ESException e)
-		{
+			Toast.makeText(this, "" + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
 			Log.d(LOG_TAG, e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 	}
 
 	@Override
-	public void onDataSensed(final SensorData data)
+	protected void onDestroy()
 	{
-		try
+		super.onDestroy();
+		for (SubscribeThread thread : subscribeThread)
 		{
-			Log.d(LOG_TAG, "Received proximity data.");
-			logger.logSensorData(data);
-		}
-		catch (Exception e)
-		{
-			Log.d(LOG_TAG, e.getLocalizedMessage());
-			e.printStackTrace();
+			thread.stopSensing();
 		}
 	}
-	
+
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+		subscribeThread = new SubscribeThread[pullSensors.length];
+		for (int i = 0; i < pullSensors.length; i++)
+		{
+			subscribeThread[i] = new SubscribeThread(this, sensorManager, logger, pullSensors[i]);
+			subscribeThread[i].start();
+		}
+	}
+
 	public void onSearchClicked(final View view)
 	{
 		try
@@ -97,7 +77,7 @@ public class MainActivity extends Activity implements SensorDataListener
 			long startTime = System.currentTimeMillis() - (1000L * 10);
 			ESDataManager dataManager = logger.getDataManager();
 			List<SensorData> recentData = dataManager.getRecentSensorData(SensorUtils.SENSOR_TYPE_PROXIMITY, startTime);
-			Toast.makeText(this, "Recent events: "+recentData.size(), Toast.LENGTH_LONG).show();
+			Toast.makeText(this, "Recent events: " + recentData.size(), Toast.LENGTH_LONG).show();
 		}
 		catch (Exception e)
 		{
@@ -106,7 +86,7 @@ public class MainActivity extends Activity implements SensorDataListener
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void onFlushClicked(final View view)
 	{
 		try
@@ -122,8 +102,4 @@ public class MainActivity extends Activity implements SensorDataListener
 			e.printStackTrace();
 		}
 	}
-
-	@Override
-	public void onCrossingLowBatteryThreshold(boolean isBelowThreshold)
-	{}
 }
