@@ -8,14 +8,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.emotionsense.demo.data.loggers.StoreOnlyUnencryptedFiles;
+import com.emotionsense.demo.data.loggers.AsyncUnencryptedDatabase;
 import com.ubhave.datahandler.ESDataManager;
+import com.ubhave.datahandler.except.DataHandlerException;
 import com.ubhave.datahandler.loggertypes.AbstractDataLogger;
+import com.ubhave.datahandler.transfer.DataUploadCallback;
 import com.ubhave.sensormanager.ESSensorManager;
 import com.ubhave.sensormanager.data.SensorData;
 import com.ubhave.sensormanager.sensors.SensorUtils;
 
-public class MainActivity extends Activity
+public class MainActivity extends Activity implements DataUploadCallback
 {
 	private final static String LOG_TAG = "MainActivity";
 
@@ -24,33 +26,27 @@ public class MainActivity extends Activity
 	private SubscribeThread[] subscribeThreads;
 	private SenseOnceThread[] pullThreads;
 
-	private final int[] pushSensors = {};
-	private final int[] pullSensors = {};
+	private final int[] pushSensors = { SensorUtils.SENSOR_TYPE_PROXIMITY };
+	private final int[] pullSensors = {}; // SensorUtils.SENSOR_TYPE_STEP_COUNTER
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
 		try
 		{
 			// TODO: change this line of code to change the type of data logger
-			logger = StoreOnlyUnencryptedFiles.getInstance();
+			logger = AsyncUnencryptedDatabase.getInstance();
 			sensorManager = ESSensorManager.getSensorManager(this);
 
-			// Use this thread to collect a single sample of pull sensor data
+			// Collect a single sample from the listed pull sensors
 			pullThreads = new SenseOnceThread[pullSensors.length];
 			for (int i = 0; i < pullSensors.length; i++)
 			{
 				pullThreads[i] = new SenseOnceThread(this, sensorManager, logger, pullSensors[i]);
 				pullThreads[i].start();
-			}
-
-			subscribeThreads = new SubscribeThread[pushSensors.length];
-			for (int i = 0; i < pushSensors.length; i++)
-			{
-				subscribeThreads[i] = new SubscribeThread(this, sensorManager, logger, pushSensors[i]);
-				subscribeThreads[i].start();
 			}
 		}
 		catch (Exception e)
@@ -58,6 +54,29 @@ public class MainActivity extends Activity
 			Toast.makeText(this, "" + e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
 			Log.d(LOG_TAG, e.getLocalizedMessage());
 			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void onResume()
+	{
+		super.onResume();
+		// Collect a single sample from the listed push sensors
+		subscribeThreads = new SubscribeThread[pushSensors.length];
+		for (int i = 0; i < pushSensors.length; i++)
+		{
+			subscribeThreads[i] = new SubscribeThread(this, sensorManager, logger, pushSensors[i]);
+			subscribeThreads[i].start();
+		}
+	}
+
+	@Override
+	public void onPause()
+	{
+		super.onPause();
+		for (SubscribeThread thread : subscribeThreads)
+		{
+			thread.stopSensing();
 		}
 	}
 
@@ -83,14 +102,25 @@ public class MainActivity extends Activity
 		try
 		{
 			ESDataManager dataManager = logger.getDataManager();
-			dataManager.postAllStoredData();
-			Toast.makeText(this, "Data transferred.", Toast.LENGTH_LONG).show();
+			dataManager.postAllStoredData(this);
 		}
-		catch (Exception e)
+		catch (DataHandlerException e)
 		{
-			Toast.makeText(this, "Error transferring data", Toast.LENGTH_LONG).show();
-			Log.d(LOG_TAG, e.getLocalizedMessage());
-			e.printStackTrace();
+			Toast.makeText(this, "Exception: "+e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+			Log.d(LOG_TAG, ""+e.getLocalizedMessage());
 		}
+		
+	}
+
+	@Override
+	public void onDataUploaded()
+	{
+		Toast.makeText(this, "Data transferred.", Toast.LENGTH_LONG).show();
+	}
+	
+	@Override
+	public void onDataUploadFailed()
+	{
+		Toast.makeText(this, "Error transferring data", Toast.LENGTH_LONG).show();
 	}
 }

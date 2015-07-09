@@ -78,9 +78,9 @@ public class SubscribeThread extends Thread implements SensorDataListener
 		try
 		{
 			logger.logSensorData(data);
-			toast("Finished sensing: "+SensorUtils.getSensorName(sensorType));
+//			toast("Finished sensing: "+SensorUtils.getSensorName(sensorType));
 			Log.d("Test", "Finished sensing: "+SensorUtils.getSensorName(sensorType));
-			stopSensing();
+//			stopSensing();
 		}
 		catch (ESException e)
 		{

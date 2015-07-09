@@ -38,7 +38,7 @@ public class AsyncUnencryptedDatabase extends AbstractAsyncTransferLogger
 	@Override
 	protected String getPostKey()
 	{
-		return RemoteServerDetails.DATA_KEY;
+		return RemoteServerDetails.FILE_KEY;
 	}
 
 	@Override
