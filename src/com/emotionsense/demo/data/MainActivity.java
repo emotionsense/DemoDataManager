@@ -26,8 +26,11 @@ public class MainActivity extends Activity implements DataUploadCallback
 	private SubscribeThread[] subscribeThreads;
 	private SenseOnceThread[] pullThreads;
 
+	// TODO: add push sensors you want to sense from here
 	private final int[] pushSensors = { SensorUtils.SENSOR_TYPE_PROXIMITY };
-	private final int[] pullSensors = {}; // SensorUtils.SENSOR_TYPE_STEP_COUNTER
+	
+	 // TODO: add pull sensors you want to sense once from here
+	private final int[] pullSensors = {};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -41,6 +44,7 @@ public class MainActivity extends Activity implements DataUploadCallback
 			logger = AsyncUnencryptedDatabase.getInstance();
 			sensorManager = ESSensorManager.getSensorManager(this);
 
+			// Example of starting some sensing in onCreate()
 			// Collect a single sample from the listed pull sensors
 			pullThreads = new SenseOnceThread[pullSensors.length];
 			for (int i = 0; i < pullSensors.length; i++)
@@ -61,6 +65,8 @@ public class MainActivity extends Activity implements DataUploadCallback
 	public void onResume()
 	{
 		super.onResume();
+		
+		// Example of starting some sensing in onResume()
 		// Collect a single sample from the listed push sensors
 		subscribeThreads = new SubscribeThread[pushSensors.length];
 		for (int i = 0; i < pushSensors.length; i++)
@@ -74,6 +80,8 @@ public class MainActivity extends Activity implements DataUploadCallback
 	public void onPause()
 	{
 		super.onPause();
+		
+		// Don't forget to stop sensing when the app pauses
 		for (SubscribeThread thread : subscribeThreads)
 		{
 			thread.stopSensing();
@@ -82,12 +90,23 @@ public class MainActivity extends Activity implements DataUploadCallback
 
 	public void onSearchClicked(final View view)
 	{
+		// Counts the number of sensor events from the last 60 seconds
 		try
 		{
-			long startTime = System.currentTimeMillis() - (1000L * 10);
+			long startTime = System.currentTimeMillis() - (1000L * 60);
 			ESDataManager dataManager = logger.getDataManager();
-			List<SensorData> recentData = dataManager.getRecentSensorData(SensorUtils.SENSOR_TYPE_PROXIMITY, startTime);
-			Toast.makeText(this, "Recent events: " + recentData.size(), Toast.LENGTH_LONG).show();
+			
+			for (int pushSensor : pushSensors)
+			{
+				List<SensorData> recentData = dataManager.getRecentSensorData(pushSensor, startTime);
+				Toast.makeText(this, "Recent "+SensorUtils.getSensorName(pushSensor)+": " + recentData.size(), Toast.LENGTH_LONG).show();
+			}
+			
+			for (int pushSensor : pullSensors)
+			{
+				List<SensorData> recentData = dataManager.getRecentSensorData(pushSensor, startTime);
+				Toast.makeText(this, "Recent "+SensorUtils.getSensorName(pushSensor)+": " + recentData.size(), Toast.LENGTH_LONG).show();
+			}
 		}
 		catch (Exception e)
 		{
@@ -99,6 +118,7 @@ public class MainActivity extends Activity implements DataUploadCallback
 
 	public void onFlushClicked(final View view)
 	{
+		// Tries to POST all of the stored sensor data to the server
 		try
 		{
 			ESDataManager dataManager = logger.getDataManager();
@@ -115,12 +135,14 @@ public class MainActivity extends Activity implements DataUploadCallback
 	@Override
 	public void onDataUploaded()
 	{
+		// Callback method: the data has been successfully posted
 		Toast.makeText(this, "Data transferred.", Toast.LENGTH_LONG).show();
 	}
 	
 	@Override
 	public void onDataUploadFailed()
 	{
+		// Callback method: the data has not been successfully posted
 		Toast.makeText(this, "Error transferring data", Toast.LENGTH_LONG).show();
 	}
 }

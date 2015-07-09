@@ -13,7 +13,7 @@ import com.ubhave.sensormanager.sensors.SensorUtils;
 
 public class SubscribeThread extends Thread implements SensorDataListener
 {
-	private final int sensorType;// = SensorUtils.SENSOR_TYPE_CONNECTION_STRENGTH;
+	private final int sensorType;
 	private final Activity resultScreen;
 	private final ESSensorManager sensorManager;
 	private final AbstractDataLogger logger;
@@ -78,9 +78,7 @@ public class SubscribeThread extends Thread implements SensorDataListener
 		try
 		{
 			logger.logSensorData(data);
-//			toast("Finished sensing: "+SensorUtils.getSensorName(sensorType));
-			Log.d("Test", "Finished sensing: "+SensorUtils.getSensorName(sensorType));
-//			stopSensing();
+			Log.d("Test", "Received from: "+SensorUtils.getSensorName(sensorType));
 		}
 		catch (ESException e)
 		{
@@ -91,5 +89,7 @@ public class SubscribeThread extends Thread implements SensorDataListener
 
 	@Override
 	public void onCrossingLowBatteryThreshold(boolean isBelowThreshold)
-	{}
+	{
+		// TODO: what happens when there is low battery?
+	}
 }
