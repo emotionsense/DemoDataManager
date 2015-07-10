@@ -72,9 +72,10 @@ public class AsyncUnencryptedDatabase extends AbstractAsyncTransferLogger
 	}
 
 	@Override
-	protected String getStorageName()
+	protected String getFileStorageName()
 	{
-		return "Demo-Unencrypted-Async-Database";
+		// Unused for database storage
+		return null;
 	}
 
 	@Override

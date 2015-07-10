@@ -8,7 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.emotionsense.demo.data.loggers.AsyncUnencryptedDatabase;
+import com.emotionsense.demo.data.loggers.StoreOnlyEncryptedDatabase;
 import com.ubhave.datahandler.ESDataManager;
 import com.ubhave.datahandler.except.DataHandlerException;
 import com.ubhave.datahandler.loggertypes.AbstractDataLogger;
@@ -23,6 +23,7 @@ public class MainActivity extends Activity implements DataUploadCallback
 
 	private AbstractDataLogger logger;
 	private ESSensorManager sensorManager;
+	
 	private SubscribeThread[] subscribeThreads;
 	private SenseOnceThread[] pullThreads;
 
@@ -41,7 +42,8 @@ public class MainActivity extends Activity implements DataUploadCallback
 		try
 		{
 			// TODO: change this line of code to change the type of data logger
-			logger = AsyncUnencryptedDatabase.getInstance();
+			logger = StoreOnlyEncryptedDatabase.getInstance();
+			
 			sensorManager = ESSensorManager.getSensorManager(this);
 
 			// Example of starting some sensing in onCreate()
@@ -129,20 +131,35 @@ public class MainActivity extends Activity implements DataUploadCallback
 			Toast.makeText(this, "Exception: "+e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
 			Log.d(LOG_TAG, ""+e.getLocalizedMessage());
 		}
-		
 	}
 
 	@Override
 	public void onDataUploaded()
 	{
-		// Callback method: the data has been successfully posted
-		Toast.makeText(this, "Data transferred.", Toast.LENGTH_LONG).show();
+		runOnUiThread(new Runnable()
+		{
+
+			@Override
+			public void run()
+			{
+				// Callback method: the data has been successfully posted
+				Toast.makeText(MainActivity.this, "Data transferred.", Toast.LENGTH_LONG).show();
+			}
+		});
 	}
 	
 	@Override
 	public void onDataUploadFailed()
 	{
-		// Callback method: the data has not been successfully posted
-		Toast.makeText(this, "Error transferring data", Toast.LENGTH_LONG).show();
+		runOnUiThread(new Runnable()
+		{
+
+			@Override
+			public void run()
+			{
+				// Callback method: the data has not been successfully posted
+				Toast.makeText(MainActivity.this, "Error transferring data", Toast.LENGTH_LONG).show();
+			}
+		});
 	}
 }

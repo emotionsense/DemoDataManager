@@ -38,7 +38,7 @@ public class AsyncEncryptedDatabase extends AbstractAsyncTransferLogger
 	@Override
 	protected String getPostKey()
 	{
-		return RemoteServerDetails.DATA_KEY;
+		return RemoteServerDetails.FILE_KEY;
 	}
 
 	@Override
@@ -72,9 +72,10 @@ public class AsyncEncryptedDatabase extends AbstractAsyncTransferLogger
 	}
 
 	@Override
-	protected String getStorageName()
+	protected String getFileStorageName()
 	{
-		return "Demo-Encrypted-Async-Database";
+		// Unused for database storage
+		return null;
 	}
 
 	@Override

@@ -28,7 +28,7 @@ public class StoreOnlyUnencryptedFiles extends AbstractStoreOnlyLogger
 	}
 
 	@Override
-	protected String getStorageName()
+	protected String getFileStorageName()
 	{
 		return "Demo-Unencrypted-Store-Only-Storage";
 	}

@@ -28,9 +28,10 @@ public class StoreOnlyUnencryptedDatabase extends AbstractStoreOnlyLogger
 	}
 
 	@Override
-	protected String getStorageName()
+	protected String getFileStorageName()
 	{
-		return "Unencrypted-Database";
+		// Unused for database storage
+		return null;
 	}
 
 	@Override

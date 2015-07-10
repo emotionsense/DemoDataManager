@@ -72,7 +72,7 @@ public class AsyncUnencryptedFiles extends AbstractAsyncTransferLogger
 	}
 
 	@Override
-	protected String getStorageName()
+	protected String getFileStorageName()
 	{
 		return "Demo-Unencrypted-Async-Storage";
 	}

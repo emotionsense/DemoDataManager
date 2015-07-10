@@ -77,14 +77,13 @@ public class SubscribeThread extends Thread implements SensorDataListener
 	{
 		try
 		{
+			Log.d("Test", "Received from: " + SensorUtils.getSensorName(sensorType));
 			logger.logSensorData(data);
-			Log.d("Test", "Received from: "+SensorUtils.getSensorName(sensorType));
 		}
-		catch (ESException e)
+		catch (Exception e)
 		{
 			toast(e.getLocalizedMessage());
 		}
-		
 	}
 
 	@Override

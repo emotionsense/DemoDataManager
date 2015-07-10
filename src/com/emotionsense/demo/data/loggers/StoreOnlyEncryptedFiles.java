@@ -29,7 +29,7 @@ public class StoreOnlyEncryptedFiles extends AbstractStoreOnlyLogger
 	}
 
 	@Override
-	protected String getStorageName()
+	protected String getFileStorageName()
 	{
 		return "Demo-Encrypted-File-Storage";
 	}
