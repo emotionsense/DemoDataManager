@@ -8,13 +8,5 @@ libs/
 
 .settings/
 
-.classpath
-
-.project
-
-proguard-project.txt
-
-project.properties
-
 src/com/emotionsense/demo/data/loggers/RemoteServerDetails.java
 
