@@ -104,4 +104,11 @@ public class AsyncEncryptedFiles extends AbstractAsyncTransferLogger
 		// Note: return non-null password to encrypt data
 		return "password";
 	}
+	
+	@Override
+	protected long getWaitForWiFiMillis()
+	{
+		// Note: wait for a Wi-Fi connection for a maximum of 4 hours
+		return 1000L * 60 * 60 * 4;
+	}
 }

@@ -11,22 +11,22 @@ import com.ubhave.datahandler.loggertypes.AbstractAsyncTransferLogger;
 import com.ubhave.datahandler.loggertypes.AbstractDataLogger;
 import com.ubhave.sensormanager.ESException;
 
-public class AsyncUnencryptedFiles extends AbstractAsyncTransferLogger
+public class AsyncWiFiOnlyEncryptedDatabase extends AbstractAsyncTransferLogger
 {
-	private static AsyncUnencryptedFiles instance;
+	private static AsyncWiFiOnlyEncryptedDatabase instance;
 
 	public static AbstractDataLogger getInstance() throws ESException, DataHandlerException
 	{
 		if (instance == null)
 		{
-			instance = new AsyncUnencryptedFiles(DemoApplication.getContext());
+			instance = new AsyncWiFiOnlyEncryptedDatabase(DemoApplication.getContext());
 		}
 		return instance;
 	}
 
-	protected AsyncUnencryptedFiles(final Context context) throws DataHandlerException, ESException
+	protected AsyncWiFiOnlyEncryptedDatabase(final Context context) throws DataHandlerException, ESException
 	{
-		super(context, DataStorageConfig.STORAGE_TYPE_FILES);
+		super(context, DataStorageConfig.STORAGE_TYPE_DB);
 	}
 
 	@Override
@@ -60,21 +60,29 @@ public class AsyncUnencryptedFiles extends AbstractAsyncTransferLogger
 	@Override
 	protected long getDataLifeMillis()
 	{
-		// Note: all files older than a minute will be uploaded
-		return 1000L * 30;
+		// Note: all data that is more than 1 minute old will be transferred
+		return 1000L * 60 * 1;
 	}
 
 	@Override
 	protected long getTransferAlarmLengthMillis()
 	{
-		// Note: transfer alarm will fire every 10 minutes
-		return 1000L * 60 * 1;
+		// Note: transfer alarm will fire every 2 minutes
+		return 1000L * 60 * 2;
+	}
+	
+	@Override
+	protected long getWaitForWiFiMillis()
+	{
+		// Note: wait for a Wi-Fi connection
+		return Long.MAX_VALUE;
 	}
 
 	@Override
 	protected String getFileStorageName()
 	{
-		return "Demo-Unencrypted-Async-Storage";
+		// Unused for database storage
+		return null;
 	}
 
 	@Override
@@ -102,13 +110,6 @@ public class AsyncUnencryptedFiles extends AbstractAsyncTransferLogger
 	protected String getEncryptionPassword()
 	{
 		// Note: return non-null password to encrypt data
-		return null;
-	}
-	
-	@Override
-	protected long getWaitForWiFiMillis()
-	{
-		// Note: wait for a Wi-Fi connection for a maximum of 4 hours
-		return 1000L * 60 * 60 * 4;
+		return "password";
 	}
 }

@@ -8,7 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.emotionsense.demo.data.loggers.StoreOnlyEncryptedDatabase;
+import com.emotionsense.demo.data.loggers.AsyncEncryptedDatabase;
 import com.ubhave.datahandler.ESDataManager;
 import com.ubhave.datahandler.except.DataHandlerException;
 import com.ubhave.datahandler.loggertypes.AbstractDataLogger;
@@ -42,7 +42,14 @@ public class MainActivity extends Activity implements DataUploadCallback
 		try
 		{
 			// TODO: change this line of code to change the type of data logger
-			logger = StoreOnlyEncryptedDatabase.getInstance();
+			logger = AsyncEncryptedDatabase.getInstance();
+//			logger = AsyncEncryptedFiles.getInstance();
+//			logger = AsyncUnencryptedDatabase.getInstance();
+//			logger = AsyncUnencryptedFiles.getInstance();
+//			logger = StoreOnlyEncryptedDatabase.getInstance();
+//			logger = StoreOnlyEncryptedFiles.getInstance();
+//			logger = StoreOnlyUnencryptedDatabase.getInstance();
+//			logger = StoreOnlyUnencryptedFiles.getInstance();
 			
 			sensorManager = ESSensorManager.getSensorManager(this);
 
