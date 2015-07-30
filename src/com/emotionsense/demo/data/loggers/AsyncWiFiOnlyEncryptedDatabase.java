@@ -3,12 +3,14 @@ package com.emotionsense.demo.data.loggers;
 import java.util.HashMap;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.emotionsense.demo.data.DemoApplication;
 import com.ubhave.datahandler.config.DataStorageConfig;
 import com.ubhave.datahandler.except.DataHandlerException;
 import com.ubhave.datahandler.loggertypes.AbstractAsyncTransferLogger;
 import com.ubhave.datahandler.loggertypes.AbstractDataLogger;
+import com.ubhave.datahandler.transfer.DataTransfer;
 import com.ubhave.sensormanager.ESException;
 
 public class AsyncWiFiOnlyEncryptedDatabase extends AbstractAsyncTransferLogger
@@ -67,8 +69,9 @@ public class AsyncWiFiOnlyEncryptedDatabase extends AbstractAsyncTransferLogger
 	@Override
 	protected long getTransferAlarmLengthMillis()
 	{
-		// Note: transfer alarm will fire every 2 minutes
-		return 1000L * 60 * 2;
+		// Note: transfer alarm will fire every 10 seconds
+		Log.d(DataTransfer.TAG, "getTransferAlarmLengthMillis => "+(1000L * 10));
+		return 1000L * 10;
 	}
 	
 	@Override
